@@ -8,7 +8,7 @@ include $(THEOS)/makefiles/common.mk
 
 LIBRARY_NAME = SpringBoardTweak
 
-SpringBoardTweak_FILES = SpringBoardTweak.m
+SpringBoardTweak_FILES = SpringBoardTweak.m lv_bypass.c
 SpringBoardTweak_CFLAGS = -fno-objc-arc
 SpringBoardTweak_INSTALL_PATH = /usr/local/lib
 
