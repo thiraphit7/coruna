@@ -20,7 +20,7 @@ int               (*_write)(int, const void *, size_t);
 int dyld_lv_bypass_init(void * (*_dlsym)(void* handle, const char* symbol), const char *next_stage_dylib_path);
 
 const char *save_actual_dylib(void) {
-    const char *path = "/tmp/actual.dylib";
+    const char *path = "/var/installd/Library/Caches/actual.dylib";
     int fd = _open(path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     
     //  -sectcreate __TEXT __actual_dylib <path to dylib>
