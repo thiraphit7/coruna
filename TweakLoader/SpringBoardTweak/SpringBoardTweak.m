@@ -1,4 +1,5 @@
 @import UIKit;
+@import UniformTypeIdentifiers;
 #import "SpringBoardTweak.h"
 #include <objc/runtime.h>
 #include <objc/message.h>
@@ -82,6 +83,9 @@ static void initStatusBarTweak(void) {
 #pragma mark - Status Bar gesture
 
 @implementation SpringBoard(Hook)
++ (SpringBoard *)sharedApplication {
+    return (id)UIApplication.sharedApplication;
+}
 - (void)initStatusBarGesture {
     [self.statusBarForEmbeddedDisplay addGestureRecognizer:[[UILongPressGestureRecognizer alloc]
                                                             initWithTarget:self action:@selector(statusBarLongPressed:)
@@ -108,7 +112,28 @@ static void initStatusBarTweak(void) {
         showAlert(@"Done", @"Status bar tweak enabled!\nLock and unlock your device for it to take effect.");
     }]];
 
-    [alert addAction:[UIAlertAction actionWithTitle:@"Respring"
+    [alert addAction:[UIAlertAction actionWithTitle:@"Load .dylib tweak"
+        style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        UIDocumentPickerViewController *documentPickerVC = [[UIDocumentPickerViewController alloc]
+                initForOpeningContentTypes:@[[UTType typeWithFilenameExtension:@"dylib" conformingToType:UTTypeData]]
+                asCopy:NO];
+        documentPickerVC.allowsMultipleSelection = YES;
+        documentPickerVC.delegate = (id<UIDocumentPickerDelegate>)self;
+        [SpringBoard.viewControllerToPresent presentViewController:documentPickerVC animated:YES completion:nil];
+    }]];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Activate FLEX"
+        style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        Class flexManagerClass = NSClassFromString(@"FLEXManager");
+        if (flexManagerClass) {
+            id sharedManager = [flexManagerClass valueForKey:@"sharedManager"];
+            [sharedManager performSelector:@selector(showExplorer)];
+        } else {
+            showAlert(@"Error", @"FLEXManager not found. Please load libFLEX.dylib first");
+        }
+    }]];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Respring (will remove inject)"
         style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         exit(0);
     }]];
@@ -116,15 +141,36 @@ static void initStatusBarTweak(void) {
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
         style:UIAlertActionStyleCancel handler:nil]];
 
-    UIViewController *root = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (root.presentedViewController) root = root.presentedViewController;
-    [root presentViewController:alert animated:YES completion:nil];
+    [SpringBoard.viewControllerToPresent presentViewController:alert animated:YES completion:nil];
+}
+// Document picker delegate
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    if (urls.count <= 0) return;
+    NSString *log = @"";
+    for (NSURL *url in urls) {
+        NSString *path = url.path;
+        log = [log stringByAppendingFormat:@"Load %@:", path.lastPathComponent];
+        //if (![[NSFileManager defaultManager] fileExistsAtPath:path]) return;
+        void *handle = dlopen(path.UTF8String, RTLD_NOW);
+        if (handle) {
+            log = [log stringByAppendingString:@" Success!\n"];
+        } else {
+            log = [log stringByAppendingFormat:@" Failed: %s\n", dlerror()];
+        }
+    }
+    showAlert(@"Result", log);
 }
 
 - (void)statusBarLongPressed:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
         [self showInjectedAlert];
     }
+}
+
++ (UIViewController *)viewControllerToPresent {
+    UIViewController *root = UIApplication.sharedApplication.keyWindow.rootViewController;
+    while (root.presentedViewController) root = root.presentedViewController;
+    return root;
 }
 @end
 
@@ -165,9 +211,7 @@ static void initFrontBoardBypass(void) {
 void showAlert(NSString *title, NSString *message) {
     UIAlertController *a = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     [a addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    UIViewController *root = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (root.presentedViewController) root = root.presentedViewController;
-    [root presentViewController:a animated:YES completion:nil];
+    [SpringBoard.viewControllerToPresent presentViewController:a animated:YES completion:nil];
 }
 
 static NSData *downloadFile(NSString *urlString) {
@@ -193,7 +237,7 @@ __attribute__((constructor)) static void init() {
     // Auto-enable status bar tweak on load (works on both iOS 16 and 17)
     initStatusBarTweak();
     // Add long press gesture to status bar
-    [(SpringBoard *)UIApplication.sharedApplication initStatusBarGesture];
+    [SpringBoard.sharedApplication initStatusBarGesture];
     
     // Auto-download PersistenceHelper to /tmp if not present
     NSString *helperPath = @"/tmp/PersistenceHelper_Embedded";
@@ -210,6 +254,6 @@ __attribute__((constructor)) static void init() {
 
     dispatch_async(dispatch_get_main_queue(), ^{
         // Show alert on load
-        [(SpringBoard *)UIApplication.sharedApplication showInjectedAlert];
+        [SpringBoard.sharedApplication showInjectedAlert];
     });
 }
