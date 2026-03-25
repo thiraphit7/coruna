@@ -17,13 +17,17 @@ coruna/
 ├── Stage1_*.js                   # Stage 1: WebKit memory corruption (3 variants)
 │   ├── Stage1_15.2_15.5_jacurutu.js      # iOS 15.2–15.5 (arm64)
 │   ├── Stage1_16.2_16.5.1_terrorbird.js  # iOS 16.2–16.5.1 (arm64e)
-│   └── Stage1_16.6_17.2.1_cassowary.js   # iOS 16.6–17.2.1 (arm64/arm64e)
+│   ├── Stage1_16.6_17.2.1_cassowary.js   # iOS 16.6–17.2.1 (arm64/arm64e)
+│   ├── Stage1_18.0_18.x_manticore.js     # iOS 18.0–18.x (stub)
+│   └── Stage1_26.0_26.x_chimera.js       # iOS 26.0–26.x (stub)
 │
-├── Stage2_*.js                   # Stage 2: PAC bypass (seedbell variants)
+├── Stage2_*.js                   # Stage 2: PAC bypass (seedbell + new variants)
 │   ├── Stage2_16.3_16.5.1_seedbell.js
 │   ├── Stage2_16.6_16.7.12_seedbell.js
 │   ├── Stage2_16.6_17.2.1_seedbell_pre.js
-│   └── Stage2_17.0_17.2.1_seedbell.js
+│   ├── Stage2_17.0_17.2.1_seedbell.js
+│   ├── Stage2_18.0_18.x_thornvine.js     # iOS 18.x PAC bypass (stub)
+│   └── Stage2_26.0_26.x_ironroot.js      # iOS 26.x PAC bypass (stub)
 │
 ├── Stage3_VariantB.js            # Stage 3: Sandbox escape, Mach-O builder, payload delivery
 ├── Atria.dylib                   # Pre-compiled arm64/arm64e exploit helper dylib
@@ -132,11 +136,13 @@ cd TweakLoader/SpringBoardTweak && make
 
 ## Tested Devices
 
-| Device | iOS Version | Exploit Chain |
-|--------|-------------|---------------|
-| iPhone 6s+ | 15.4.1 | jacurutu → VariantB |
-| iPhone Xs Max | 16.5 | terrorbird → seedbell → VariantB |
-| iPhone 15 Pro Max | 17.0 | cassowary → seedbell_pre → seedbell_17 → VariantB |
+| Device | iOS Version | Exploit Chain | Status |
+|--------|-------------|---------------|--------|
+| iPhone 6s+ | 15.4.1 | jacurutu → VariantB | Tested |
+| iPhone Xs Max | 16.5 | terrorbird → seedbell → VariantB | Tested |
+| iPhone 15 Pro Max | 17.0 | cassowary → seedbell_pre → seedbell_17 → VariantB | Tested |
+| (TBD) | 18.1 | manticore → thornvine → VariantB | Stub |
+| (TBD) | 26.1 | chimera → ironroot → VariantB | Stub |
 
 ## Dependencies
 

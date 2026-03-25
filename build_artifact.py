@@ -25,11 +25,15 @@ STAGE_MODULES = {
     "Stage1_15.2_15.5_jacurutu": "Stage1_15.2_15.5_jacurutu.js",
     "Stage1_16.2_16.5.1_terrorbird": "Stage1_16.2_16.5.1_terrorbird.js",
     "Stage1_16.6_17.2.1_cassowary": "Stage1_16.6_17.2.1_cassowary.js",
+    "Stage1_18.0_18.x_manticore": "Stage1_18.0_18.x_manticore.js",
+    "Stage1_26.0_26.x_chimera": "Stage1_26.0_26.x_chimera.js",
     # Stage 2 — PAC bypass
     "Stage2_16.3_16.5.1_seedbell": "Stage2_16.3_16.5.1_seedbell.js",
     "Stage2_16.6_16.7.12_seedbell": "Stage2_16.6_16.7.12_seedbell.js",
     "Stage2_16.6_17.2.1_seedbell_pre": "Stage2_16.6_17.2.1_seedbell_pre.js",
     "Stage2_17.0_17.2.1_seedbell": "Stage2_17.0_17.2.1_seedbell.js",
+    "Stage2_18.0_18.x_thornvine": "Stage2_18.0_18.x_thornvine.js",
+    "Stage2_26.0_26.x_ironroot": "Stage2_26.0_26.x_ironroot.js",
     # Stage 3 — Sandbox escape
     "Stage3_VariantB": "Stage3_VariantB.js",
 }
